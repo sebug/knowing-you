@@ -1,8 +1,10 @@
 async function register() {
     const challengeResponse = await fetch('/api/CreateChallengeTrigger');
-    const challenge = await challengeResponse.json();
+    const challengeObject = await challengeResponse.json();
 
-    console.log(challenge);
+    const challengeArray = Uint8Array.from(challengeObject.challeng.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+
+    console.log(challengeArray);
 }
 
 
