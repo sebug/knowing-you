@@ -3,6 +3,17 @@ async function register() {
         return;
     }
 
+    const usernameEl = document.querySelector('#username');
+    const displayNameEl = document.querySelector('#displayname');
+
+    const userName = usernameEl.value;
+    const displayName = displayNameEl.value;
+
+    console.log({
+        userName: userName,
+        displayName: displayName
+    });
+
     const challengeResponse = await fetch('/api/CreateChallengeTrigger');
     const challengeObject = await challengeResponse.json();
 
@@ -13,6 +24,12 @@ async function register() {
           // Relying Party (a.k.a. - Service):
           rp: {
             name: "sebugch",
+          },
+
+          user: {
+            id: new Uint8Array(16),
+            name: userName,
+            displayName: displayName,
           },
       
           pubKeyCredParams: [
@@ -47,4 +64,9 @@ async function getMessage() {
 
 getMessage();
 
-register();
+const registerForm = document.querySelector('#register');
+if (registerForm) {
+    registerForm.addEventListener('submit', () => {
+        register();
+    });
+}
