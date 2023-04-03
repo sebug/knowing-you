@@ -66,7 +66,8 @@ getMessage();
 
 const registerForm = document.querySelector('#register');
 if (registerForm) {
-    registerForm.addEventListener('submit', () => {
+    registerForm.addEventListener('submit', (ev) => {
         register();
+        ev.preventDefault();
     });
 }
