@@ -182,13 +182,16 @@ module.exports = async function (context, req) {
         const publicKey = cbor.decodeFirstSync(keyData);
 
         // check the algorithm to be -7 as requested
-        if (publicKey[3] !== -7) {
+        if (publicKey.get(3) !== -7) {
             context.res = {
                 status: 400,
-                body: 'Expected ES256 signature algorithm'
+                body: 'Expected ES256 signature algorithm but got ' + publicKey.get(3)
             };
             return;
         }
+
+        // No extensions were specified, we don't have to check on anything here
+
     
         const response = {
             challenge: challenge,
