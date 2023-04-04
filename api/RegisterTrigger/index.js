@@ -90,6 +90,7 @@ module.exports = async function (context, req) {
         // 8. require that the challenge matches
         if (challenge.randomBytes.replace(/=/g, '')
         .replace(/\//g, '_')
+        .replace(/\+/g, '-')
         !== c.challenge) {
             context.res = {
                 status: 400,
