@@ -239,7 +239,8 @@ module.exports = async function (context, req) {
             userName: req.body.userName,
             displayName: req.body.displayName,
             counter: counter,
-            publicKeyInfo: publicKeyInfo
+            publicKeyInfo: publicKeyInfo,
+            transports: req.body.transports
         };
     
         context.res = {

@@ -52,7 +52,8 @@ async function register() {
       clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credentialResponse.response.clientDataJSON))),
       attestationObject: btoa(String.fromCharCode(...new Uint8Array(credentialResponse.response.attestationObject))),
       userName: userName,
-      displayName: displayName
+      displayName: displayName,
+      transports: credentialResponse.response.getTransports()
     };
     const registerResponse = await fetch('/api/RegisterTrigger', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(objectToSend)});
     const registerObj = await registerResponse.json();
