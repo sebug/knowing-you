@@ -148,7 +148,8 @@ module.exports = async function (context, req) {
             hash: hash,
             expectedRpIdHash: expectedRpIdHash,
             actualRpIdHash: actualRpIdHash,
-            flags: flags
+            flags: flags,
+            same: expectedRpIdHash.compare(actualRpIdHash) === 0
         };
     
         context.res = {
