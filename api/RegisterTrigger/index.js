@@ -1,3 +1,38 @@
+const crypto = require('crypto');
+const { TableServiceClient, AzureNamedKeyCredential, TableClient } = require("@azure/data-tables");
+
+async function getChallenge(context, rowKey) {
+    try {
+        const account = process.env.TABLES_STORAGE_ACCOUNT_NAME;
+        const accountKey = process.env.TABLES_PRIMARY_STORAGE_ACCOUNT_KEY;
+        const suffix = process.env.TABLES_STORAGE_ENDPOINT_SUFFIX;
+    
+        const url = 'https://' + account + '.table.' + suffix;
+    
+        const credential = new AzureNamedKeyCredential(account, accountKey);
+        const serviceClient = new TableServiceClient(
+            url,
+            credential
+        );
+    
+        const tableName = 'challenges';
+        await serviceClient.createTable(tableName, {
+            onResponse: (response) => {
+                if (response.status === 409) {
+                    context.log('Table challenges already exists');
+                }
+            }
+        });
+        const tableClient = new TableClient(url, tableName, credential);
+
+        await tableClient.getEntity('Prod', rowKey);
+        return entity;
+    } catch (err) {
+        context.log(err);
+        throw err;
+    }
+}
+
 module.exports = async function (context, req) {
     try {
         context.log('JavaScript HTTP trigger function processed a request.');
@@ -7,15 +42,28 @@ module.exports = async function (context, req) {
                 status: 400,
                 body: "Malformed object"
             };
+            return;
         }
+
+        // Following the algorithm here: https://w3c.github.io/webauthn/#sctn-registering-a-new-credential
     
-        const clientData = JSON.parse(new TextDecoder().decode(
+        const c = JSON.parse(new TextDecoder().decode(
             Uint8Array.from(
             atob(req.body.clientDataJSON), c => c.charCodeAt(0))));
+
+        if (c.type !== 'webauthn.create') {
+            context.res = {
+                status: 400,
+                body: 'client data type is not correct'
+            };
+            return;
+        }
+
+        const challenge = await getChallenge(req.body.id);
     
         const response = {
-            id: req.body.id,
-            clientData: clientData,
+            challenge: challenge,
+            clientData: c,
             attestationObject: req.body.attestationObject
         };
     
