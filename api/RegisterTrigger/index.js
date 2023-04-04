@@ -172,7 +172,11 @@ module.exports = async function (context, req) {
 
         const aaguid = authData.slice(37, 53);
 
-        const l = authData.slice(53, 55);
+        const l = (authData[53] << 16) + authData[54];
+
+        const credentialID = authData.slice(55, 55 + l);
+
+        // after the credential ID we should have the public key - decode in CBOR again
     
         const response = {
             challenge: challenge,
@@ -181,7 +185,8 @@ module.exports = async function (context, req) {
             hash: hash,
             flags: flags,
             aaguid: aaguid,
-            l: l
+            l: l,
+            credentialID: credentialID
         };
     
         context.res = {
