@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const cbor = require('cbor');
 const { TableServiceClient, AzureNamedKeyCredential, TableClient } = require("@azure/data-tables");
 
 async function getTableClient(context, tableName) {
@@ -115,12 +116,19 @@ module.exports = async function (context, req) {
         }
 
         const hash = crypto.createHash('sha256').update(clientDataJSONArray).digest();
+
+        const attestationObjectBytes =
+            Uint8Array.from(
+                atob(req.body.attestationObject), c => c.charCodeAt(0));
+
+        const fmt = cbor.decodeFirstSync(attestationObjectBytes);
     
         const response = {
             challenge: challenge,
             clientData: c,
             attestationObject: req.body.attestationObject,
-            hash: hash
+            hash: hash,
+            fmt: fmt
         };
     
         context.res = {
