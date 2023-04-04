@@ -48,8 +48,6 @@ async function deleteChallenge(context, rowKey) {
     }
 }
 
-const relyingPartyID = "sebugch";
-
 module.exports = async function (context, req) {
     try {
         context.log('JavaScript HTTP trigger function processed a request.');
@@ -135,7 +133,7 @@ module.exports = async function (context, req) {
 
         const authData = attestationObject.authData;
 
-        const expectedRpIdHash = crypto.createHash('sha256').update(relyingPartyID, 'utf8').digest();
+        const expectedRpIdHash = crypto.createHash('sha256').update(process.env.RP_ID, 'utf8').digest();
 
         const actualRpIdHash = authData.slice(0, 32);
 
