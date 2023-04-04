@@ -90,7 +90,8 @@ module.exports = async function (context, req) {
         if (challenge.randomBytes.replace(/=/g, '') !== c.challenge) {
             context.res = {
                 status: 400,
-                body: 'Invalid challenge value'
+                body: 'Invalid challenge value - expected ' + challenge.randomBytes.replace(/=/g, '') + ' and got ' +
+                c.challenge
             };
             return;
         }
