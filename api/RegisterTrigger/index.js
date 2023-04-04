@@ -59,7 +59,7 @@ module.exports = async function (context, req) {
             return;
         }
 
-        const challenge = await getChallenge(req.body.id);
+        const challenge = await getChallenge(context, req.body.id);
     
         const response = {
             challenge: challenge,
