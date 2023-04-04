@@ -59,6 +59,23 @@ module.exports = async function (context, req) {
         }
 
         const challenge = await getChallenge(context, req.body.id);
+
+        if (!challenge) {
+            context.res = {
+              status: 404,
+              body: 'Challenge not found'  
+            };
+            return;
+        }
+
+        // 8. require that the challenge matches
+        if (challenge.randomBytes.replace(/=/g, '') !== c.challenge) {
+            context.res = {
+                status: 400,
+                body: 'Invalid challenge value'
+            };
+            return;
+        }
     
         const response = {
             challenge: challenge,
