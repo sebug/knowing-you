@@ -8,9 +8,11 @@ module.exports = async function (context, req) {
         };
     }
 
+    const clientData = JSON.parse(new TextDecoder().decode(atob(req.body.clientDataJSON)));
+
     const response = {
         id: req.body.id,
-        clientDataJSON: req.body.clientDataJSON,
+        clientData: clientData,
         attestationObject: req.body.attestationObject
     };
 
