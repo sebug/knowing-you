@@ -127,6 +127,14 @@ module.exports = async function (context, req) {
 
         if (fmt !== 'none') {
             // TODO: Validate provenance
+            context.res = {
+                status: 400,
+                body: {
+                    message: 'additional info',
+                    info: attestationObject
+                }
+            };
+            return;
         }
 
         const attStmt = attestationObject.attStmt;
