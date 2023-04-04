@@ -94,7 +94,14 @@ module.exports = async function (context, req) {
 
         await deleteChallenge(context, req.body.id);
 
-        
+        // 9 check that the origin matches
+        if (c.origin.toLowerCase() !== process.env.ALLOWED_ORIGIN) {
+            context.res = {
+                status: 400,
+                body: 'Invalid origin'
+            };
+            return;
+        }
     
         const response = {
             challenge: challenge,
