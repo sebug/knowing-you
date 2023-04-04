@@ -174,7 +174,15 @@ module.exports = async function (context, req) {
 
         const l = (authData[53] << 16) + authData[54];
 
-        const credentialID = authData.slice(55, 55 + l);
+        if (l > 1023) {
+            context.res = {
+                status: 400,
+                body: 'credential id too long'
+            };
+            return;
+        }
+
+        const credentialID = btoa(String.fromCharCode(...authData.slice(55, 55 + l)));
 
         // after the credential ID we should have the public key - decode in CBOR again
         const keyData = authData.slice(55 + l);
@@ -191,6 +199,7 @@ module.exports = async function (context, req) {
         }
 
         // No extensions were specified, we don't have to check on anything here
+
 
     
         const response = {
