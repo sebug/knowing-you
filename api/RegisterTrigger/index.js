@@ -48,6 +48,8 @@ async function deleteChallenge(context, rowKey) {
     }
 }
 
+const relyingPartyID = "sebugch";
+
 module.exports = async function (context, req) {
     try {
         context.log('JavaScript HTTP trigger function processed a request.');
@@ -121,14 +123,29 @@ module.exports = async function (context, req) {
             Uint8Array.from(
                 atob(req.body.attestationObject), c => c.charCodeAt(0));
 
-        const fmt = cbor.decodeFirstSync(attestationObjectBytes);
+        const attestationObject = cbor.decodeFirstSync(attestationObjectBytes);
+
+        const fmt = attestationObject.fmt;
+
+        if (fmt !== 'none') {
+            // TODO: Validate provenance
+        }
+
+        const attStmt = attestationObject.attStmt;
+
+        const authData = attestationObject.authData;
+
+        const expectedRpIdHash = crypto.createHash('sha256').update(relyingPartyID, 'utf8').digest().data;
+
+        const actualRpIdHash = authData.slice(0, 32);
     
         const response = {
             challenge: challenge,
             clientData: c,
-            attestationObject: req.body.attestationObject,
+            attestationObject: attestationObject,
             hash: hash,
-            fmt: fmt
+            expectedRpIdHash: expectedRpIdHash,
+            actualRpIdHash: actualRpIdHash
         };
     
         context.res = {
