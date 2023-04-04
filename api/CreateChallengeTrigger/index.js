@@ -1,4 +1,5 @@
 const crypto = require('crypto');
+const { v4: uuidv4 } = require('uuid');
 const { TableServiceClient, AzureNamedKeyCredential, TableClient } = require("@azure/data-tables");
 
 async function insertChallenge(context) {
@@ -29,6 +30,7 @@ async function insertChallenge(context) {
 
         let entity = {
             partitionKey: "Prod",
+            rowKey: uuidv4(),
             randomBytes: randomBytes
         };
         await tableClient.createEntity(entity);
