@@ -20,7 +20,7 @@ async function register() {
     const challengeResponse = await fetch('/api/CreateChallengeTrigger');
     const challengeObject = await challengeResponse.json();
 
-    const challengeArray = Uint8Array.from(challengeObject.challenge.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
+    const challengeArray = Uint8Array.from(atob(challengeObject.challenge), c => c.charCodeAt(0));
 
     const createCredentialDefaultArgs = {
         publicKey: {
