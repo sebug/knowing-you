@@ -137,17 +137,51 @@ module.exports = async function (context, req) {
 
         const actualRpIdHash = authData.slice(0, 32);
 
+        // 13 - compare RP ID hash
+        if (expectedRpIdHash.compare(actualRpIdHash) !== 0) {
+            context.res = {
+                status: 400,
+                body: 'Invalid RP ID'
+            };
+            return;
+        }
+
         const flags = authData[32];
+
+        // 14 check that the UP bit is present - least significant bit
+        if (!(flags & (1 << 0))) {
+            context.res = {
+                status: 400,
+                body: 'User not present'
+            };
+            return;
+        }
+
+        // 15 ensure user verification bit is present
+        if (!(flags & (1 << 2))) {
+            context.res = {
+                status: 400,
+                body: 'User verification not present'
+            };
+            return;
+        }
+
+        // 16 we don't care about backup eligibility
+
+        // 17 we don't care about the backup state
+
+        const aaguid = authData.slice(37, 53);
+
+        const l = authData.slice(53, 55);
     
         const response = {
             challenge: challenge,
             clientData: c,
             attestationObject: attestationObject,
             hash: hash,
-            expectedRpIdHash: expectedRpIdHash,
-            actualRpIdHash: actualRpIdHash,
             flags: flags,
-            same: expectedRpIdHash.compare(actualRpIdHash) === 0
+            aaguid: aaguid,
+            l: l
         };
     
         context.res = {
