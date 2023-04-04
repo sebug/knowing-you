@@ -25,8 +25,7 @@ async function getChallenge(context, rowKey) {
         });
         const tableClient = new TableClient(url, tableName, credential);
 
-        await tableClient.getEntity('Prod', rowKey);
-        return entity;
+        return await tableClient.getEntity('Prod', rowKey);
     } catch (err) {
         context.log(err);
         throw err;
