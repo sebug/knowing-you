@@ -9,7 +9,9 @@ module.exports = async function (context, req) {
             };
         }
     
-        const clientData = JSON.parse(new TextDecoder().decode(atob(req.body.clientDataJSON)));
+        const clientData = JSON.parse(new TextDecoder().decode(
+            Uint8Array.from(
+            atob(req.body.clientDataJSON), c => c.charCodeAt(0))));
     
         const response = {
             id: req.body.id,
