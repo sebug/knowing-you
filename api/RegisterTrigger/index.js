@@ -178,6 +178,19 @@ module.exports = async function (context, req) {
 
         // after the credential ID we should have the public key - decode in CBOR again
         const keyData = authData.slice(55 + l);
+
+        const publicKey = cbor.decodeFirstSync(keyData);
+
+        // check the algorithm to be -7 as requested
+        if (publicKey[3] !== -7) {
+            context.res = {
+                status: 400,
+                body: 'Expected ES256 signature algorithm'
+            };
+            return;
+        }
+
+        const rest = cbor.decodeAllSync(keyData);
     
         const response = {
             challenge: challenge,
@@ -188,7 +201,8 @@ module.exports = async function (context, req) {
             aaguid: aaguid,
             l: l,
             credentialID: credentialID,
-            keyData: keyData
+            keyData: keyData,
+            rest: rest
         };
     
         context.res = {
