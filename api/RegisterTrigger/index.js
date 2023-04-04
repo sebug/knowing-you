@@ -52,7 +52,8 @@ module.exports = async function (context, req) {
     try {
         context.log('JavaScript HTTP trigger function processed a request.');
 
-        if (!req.body || !req.body.id || !req.body.clientDataJSON || !req.body.attestationObject) {
+        if (!req.body || !req.body.id || !req.body.clientDataJSON || !req.body.attestationObject ||
+            !req.body.userName || !req.body.displayName) {
             context.res = {
                 status: 400,
                 body: "Malformed object"
@@ -210,7 +211,9 @@ module.exports = async function (context, req) {
             aaguid: aaguid,
             l: l,
             credentialID: credentialID,
-            keyData: keyData
+            keyData: keyData,
+            userName: req.body.userName,
+            displayName: req.body.displayName
         };
     
         context.res = {
