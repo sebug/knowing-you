@@ -60,10 +60,12 @@ module.exports = async function (context, req) {
         }
 
         // Following the algorithm here: https://w3c.github.io/webauthn/#sctn-registering-a-new-credential
-    
-        const c = JSON.parse(new TextDecoder().decode(
+        const clientDataJSONArray = 
             Uint8Array.from(
-            atob(req.body.clientDataJSON), c => c.charCodeAt(0))));
+                atob(req.body.clientDataJSON), c => c.charCodeAt(0));
+        const c = JSON.parse(new TextDecoder().decode(
+            clientDataJSONArray
+            ));
 
         if (c.type !== 'webauthn.create') {
             context.res = {
@@ -102,11 +104,23 @@ module.exports = async function (context, req) {
             };
             return;
         }
+
+        // 10 check topOrigin
+        if (c.topOrigin && c.topOrigin !== process.env.ALLOWED_ORIGIN) {
+            context.res = {
+                status: 400,
+                body: 'Invalid top origin'
+            };
+            return;
+        }
+
+        const hash = crypto.createHash('sha256').update(clientDataJSONArray).digest();
     
         const response = {
             challenge: challenge,
             clientData: c,
-            attestationObject: req.body.attestationObject
+            attestationObject: req.body.attestationObject,
+            hash: hash
         };
     
         context.res = {
