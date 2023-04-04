@@ -126,17 +126,7 @@ module.exports = async function (context, req) {
 
         const fmt = attestationObject.fmt;
 
-        if (fmt !== 'none') {
-            // TODO: Validate provenance
-            context.res = {
-                status: 400,
-                body: {
-                    message: 'additional info',
-                    info: attestationObject
-                }
-            };
-            return;
-        }
+        // even if the fmt is not 'none', we won't really check provenance - see comment here: https://developer.apple.com/forums/thread/713195
 
         const attStmt = attestationObject.attStmt;
 
