@@ -189,8 +189,6 @@ module.exports = async function (context, req) {
             };
             return;
         }
-
-        const rest = cbor.decodeAllSync(keyData);
     
         const response = {
             challenge: challenge,
@@ -201,8 +199,7 @@ module.exports = async function (context, req) {
             aaguid: aaguid,
             l: l,
             credentialID: credentialID,
-            keyData: keyData,
-            rest: rest
+            keyData: keyData
         };
     
         context.res = {
