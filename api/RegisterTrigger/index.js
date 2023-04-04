@@ -170,9 +170,11 @@ module.exports = async function (context, req) {
 
         // 17 we don't care about the backup state
 
+        const counter = (authData[33] << 32) + (authData[34] << 16) + (authData[35] << 8) + authData[36];
+
         const aaguid = authData.slice(37, 53);
 
-        const l = (authData[53] << 16) + authData[54];
+        const l = (authData[53] << 8) + authData[54];
 
         if (l > 1023) {
             context.res = {
@@ -198,6 +200,8 @@ module.exports = async function (context, req) {
             return;
         }
 
+        
+
         // No extensions were specified, we don't have to check on anything here
 
 
@@ -213,7 +217,8 @@ module.exports = async function (context, req) {
             credentialID: credentialID,
             keyData: keyData,
             userName: req.body.userName,
-            displayName: req.body.displayName
+            displayName: req.body.displayName,
+            counter: counter
         };
     
         context.res = {
