@@ -139,7 +139,7 @@ module.exports = async function (context, req) {
 
         const actualRpIdHash = authData.slice(0, 32);
 
-        const flags = authData.slice(32, 33);
+        const flags = authData[32];
     
         const response = {
             challenge: challenge,
