@@ -24,13 +24,11 @@ async function insertChallenge(context) {
             }
         });
         const tableClient = new TableClient(url, tableName, credential);
-        const rowKey = crypto.randomBytes(16).toString('base64');
 
         const randomBytes = crypto.randomBytes(16).toString('base64');
 
         let entity = {
             partitionKey: "Prod",
-            rowKey: rowKey,
             randomBytes: randomBytes
         };
         await tableClient.createEntity(entity);
@@ -42,15 +40,22 @@ async function insertChallenge(context) {
 }
 
 module.exports = async function (context, req) {
-    context.log('Create Challenge HTTP trigger function processed a request.');
+    try {
+        context.log('Create Challenge HTTP trigger function processed a request.');
 
-    const insertResult = await insertChallenge(context);
-
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: {
-            challenge: insertResult.randomBytes,
-            id: insertResult.rowKey
-        }
-    };
+        const insertResult = await insertChallenge(context);
+    
+        context.res = {
+            // status: 200, /* Defaults to 200 */
+            body: {
+                challenge: insertResult.randomBytes,
+                id: insertResult.rowKey
+            }
+        };
+    } catch (e) {
+        context.res = {
+            status: 500,
+            body: '' + e
+        };
+    }
 }
