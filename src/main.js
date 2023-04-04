@@ -1,4 +1,7 @@
 async function register() {
+    if (!window.PublicKeyCredential) {
+      return;
+    }
     if (!navigator.credentials || !navigator.credentials.create) {
         return;
     }

@@ -24,9 +24,9 @@ async function insertChallenge(context) {
             }
         });
         const tableClient = new TableClient(url, tableName, credential);
-        const rowKey = crypto.randomBytes(64).toString('hex');
+        const rowKey = crypto.randomBytes(16).toString('hex');
 
-        const randomBytes = crypto.randomBytes(64).toString('hex');
+        const randomBytes = crypto.randomBytes(16).toString('hex');
 
         let entity = {
             partitionKey: "Prod",
