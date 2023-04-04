@@ -151,7 +151,8 @@ module.exports = async function (context, req) {
         const flags = authData[32];
 
         // 14 check that the UP bit is present - least significant bit
-        if (!(flags & (1 << 0))) {
+        const upBit = Boolean(flags & (1 << 0));
+        if (!upBit) {
             context.res = {
                 status: 400,
                 body: 'User not present'
@@ -160,7 +161,8 @@ module.exports = async function (context, req) {
         }
 
         // 15 ensure user verification bit is present
-        if (!(flags & (1 << 2))) {
+        const uvBit = Boolean(flags & (1 << 2));
+        if (!uvBit) {
             context.res = {
                 status: 400,
                 body: 'User verification not present'
@@ -169,8 +171,16 @@ module.exports = async function (context, req) {
         }
 
         // 16 we don't care about backup eligibility
+        const beBit = Boolean(flags & (1 << 3));
 
         // 17 we don't care about the backup state
+        const bsBit = Boolean(flags & (1 << 4));
+
+        // attestation included - not checked because we're in passkey mode
+        const atBit = Boolean(flags & (1 << 6));
+
+        // extension data included - we assume it's not, in passkey mode again
+        const edBit = Boolean(flags & (1 << 7));
 
         const counter = (authData[33] << 32) + (authData[34] << 16) + (authData[35] << 8) + authData[36];
 
