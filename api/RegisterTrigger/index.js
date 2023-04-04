@@ -138,6 +138,8 @@ module.exports = async function (context, req) {
         const expectedRpIdHash = crypto.createHash('sha256').update(relyingPartyID, 'utf8').digest().data;
 
         const actualRpIdHash = authData.slice(0, 32);
+
+        const flags = authData.slice(32, 33);
     
         const response = {
             challenge: challenge,
@@ -145,7 +147,8 @@ module.exports = async function (context, req) {
             attestationObject: attestationObject,
             hash: hash,
             expectedRpIdHash: expectedRpIdHash,
-            actualRpIdHash: actualRpIdHash
+            actualRpIdHash: actualRpIdHash,
+            flags: flags
         };
     
         context.res = {
