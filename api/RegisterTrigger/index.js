@@ -212,6 +212,13 @@ module.exports = async function (context, req) {
             return;
         }
 
+        // public key info
+        const publicKeyInfo = {
+            kty: publicKey.get(1),
+            crv: publicKey.get(-1),
+            x: btoa(String.fromCharCode(...publicKey.get(-2))),
+            y: btoa(String.fromCharCode(...publicKey.get(-3)))
+        };
         
 
         // No extensions were specified, we don't have to check on anything here
@@ -230,7 +237,8 @@ module.exports = async function (context, req) {
             keyData: keyData,
             userName: req.body.userName,
             displayName: req.body.displayName,
-            counter: counter
+            counter: counter,
+            publicKeyInfo: publicKeyInfo
         };
     
         context.res = {
