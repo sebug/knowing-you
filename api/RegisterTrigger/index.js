@@ -88,7 +88,9 @@ module.exports = async function (context, req) {
         }
 
         // 8. require that the challenge matches
-        if (challenge.randomBytes.replace(/=/g, '') !== c.challenge) {
+        if (challenge.randomBytes.replace(/=/g, '')
+        .replace(/\//g, '_')
+        !== c.challenge) {
             context.res = {
                 status: 400,
                 body: 'Invalid challenge value - expected ' + challenge.randomBytes.replace(/=/g, '') + ' and got ' +
