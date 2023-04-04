@@ -135,7 +135,7 @@ module.exports = async function (context, req) {
 
         const authData = attestationObject.authData;
 
-        const expectedRpIdHash = crypto.createHash('sha256').update(relyingPartyID, 'utf8').digest().data;
+        const expectedRpIdHash = crypto.createHash('sha256').update(relyingPartyID, 'utf8').digest();
 
         const actualRpIdHash = authData.slice(0, 32);
 
