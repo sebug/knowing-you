@@ -184,6 +184,10 @@ module.exports = async function (context, req) {
         }
 
         const hash = crypto.createHash('sha256').update(clientDataJSONArray).digest();
+
+        var concatenation = new Uint8Array(authData.length + hash.length);
+        concatenation.set(authData);
+        concatenation.set(hash, authData.length);
     
         const response = {
             challengeID: req.body.challengeID,
@@ -194,7 +198,7 @@ module.exports = async function (context, req) {
             auhenticatorData: authenticatorDataBase64,
             authenticatorDataLength: authData.length,
             flags: flags,
-            hash: hash
+            concatenation: concatenation
         };
     
         context.res = {
