@@ -188,6 +188,15 @@ module.exports = async function (context, req) {
         var concatenation = new Uint8Array(authData.length + hash.length);
         concatenation.set(authData);
         concatenation.set(hash, authData.length);
+
+        const publicKeyInfo = {
+            kty: credential.kty,
+            crv: credential.crv,
+            x: Uint8Array.from(
+                atob(credential.x), c => c.charCodeAt(0)),
+            y: Uint8Array.from(
+                atob(credential.y), c => c.charCodeAt(0))
+        };
     
         const response = {
             challengeID: req.body.challengeID,
@@ -198,7 +207,8 @@ module.exports = async function (context, req) {
             auhenticatorData: authenticatorDataBase64,
             authenticatorDataLength: authData.length,
             flags: flags,
-            concatenation: concatenation
+            concatenation: concatenation,
+            publicKeyInfo: publicKeyInfo
         };
     
         context.res = {
