@@ -215,9 +215,15 @@ module.exports = async function (context, req) {
 
         const hashOfConcatenation = crypto.createHash('sha256').update(concatenation).digest();
 
-        hashOfConcatenation[3] = 42; // explicitly breaking it
-
         const signatureVerificationResult = ec.verify(hashOfConcatenation, ecsig, pkec);
+
+        if (!signatureVerificationResult) {
+            context.res = {
+                status: 401,
+                body: 'Signature does not match'
+            };
+            return;
+        }
     
         const response = {
             challengeID: req.body.challengeID,
