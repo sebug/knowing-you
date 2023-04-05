@@ -1,3 +1,15 @@
+async function getChallenge() {
+  const challengeResponse = await fetch('/api/CreateChallengeTrigger');
+  const challengeObject = await challengeResponse.json();
+
+  const challengeArray = Uint8Array.from(atob(challengeObject.challenge), c => c.charCodeAt(0));
+
+  return {
+    id: challengeObject.id,
+    buffer: challengeArray.buffer
+  };
+}
+
 async function register() {
     if (!window.PublicKeyCredential) {
       return;
@@ -12,10 +24,7 @@ async function register() {
     const userName = usernameEl.value;
     const displayName = displayNameEl.value;
 
-    const challengeResponse = await fetch('/api/CreateChallengeTrigger');
-    const challengeObject = await challengeResponse.json();
-
-    const challengeArray = Uint8Array.from(atob(challengeObject.challenge), c => c.charCodeAt(0));
+    const challenge = await getChallenge();
 
     const createCredentialDefaultArgs = {
         publicKey: {
@@ -41,14 +50,14 @@ async function register() {
       
           timeout: 60000,
       
-          challenge: challengeArray.buffer,
+          challenge: challenge.buffer,
         }
       };
     
     const credentialResponse = await navigator.credentials.create(createCredentialDefaultArgs);
 
     const objectToSend = {
-      id: challengeObject.id,
+      id: challenge.id,
       clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credentialResponse.response.clientDataJSON))),
       attestationObject: btoa(String.fromCharCode(...new Uint8Array(credentialResponse.response.attestationObject))),
       userName: userName,
@@ -61,7 +70,20 @@ async function register() {
 }
 
 async function login() {
+  if (!window.PublicKeyCredential || !window.PublicKeyCredential.isConditionalMediationAvailable) {
+    alert('Conditional mediation not available');
+    return;
+  }
   console.log('Starting login');
+  const challenge = await getChallenge();
+  const options = {
+    publicKey: {
+      challenge: challenge.buffer
+    },
+    mediation: 'conditional'
+  };
+  const assertion = await navigator.credentials.get(options);
+  console.log(assertion);
 }
 
 
