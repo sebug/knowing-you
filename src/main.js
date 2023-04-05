@@ -105,6 +105,7 @@ async function login() {
   try {
     const assertion = await navigator.credentials.get(options);
     console.log(assertion);
+    window.assertion = assertion;
   } catch (e) {
     console.error(e);
   }
