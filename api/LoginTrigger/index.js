@@ -126,6 +126,8 @@ module.exports = async function (context, req) {
 
         const actualSignatureBase64 = req.body.signature;
 
+        const authenticatorDataBase64 = req.body.authenticatorData;
+
         if (!actualSignatureBase64) {
             context.res = {
                 status: 400,
@@ -139,7 +141,8 @@ module.exports = async function (context, req) {
             clientData: c,
             challenge: challenge,
             credential: credential,
-            signature: actualSignatureBase64
+            signature: actualSignatureBase64,
+            auhenticatorData: authenticatorDataBase64
         };
     
         context.res = {
