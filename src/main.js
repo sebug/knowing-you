@@ -75,15 +75,27 @@ async function login() {
     return;
   }
   console.log('Starting login');
-  const challenge = await getChallenge();
+  const challenge = window.loginChallenge;
+  if (!challenge) {
+    challenge = getChallenge();
+  } else {
+    // set new challenge for next attempt
+    getChallenge().then(challenge => {
+      window.loginChallenge = challenge;
+    });
+  }
   const options = {
     publicKey: {
       challenge: challenge.buffer
     },
     mediation: 'conditional'
   };
-  const assertion = await navigator.credentials.get(options);
-  console.log(assertion);
+  try {
+    const assertion = await navigator.credentials.get(options);
+    console.log(assertion);
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 
@@ -114,3 +126,7 @@ if (loginForm) {
     ev.preventDefault();
   });
 }
+
+getChallenge().then(challenge => {
+  window.loginChallenge = challenge;
+});
