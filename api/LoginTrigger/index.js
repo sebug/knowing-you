@@ -55,28 +55,35 @@ function webSafeBase64(s) {
 }
 
 module.exports = async function (context, req) {
-    context.log('Login trigger function processed a request.');
+    try {
+        context.log('Login trigger function processed a request.');
 
-    const challenge = await getChallenge(req.body.challengeID);
-
-    const clientDataJSONArray = 
-        Uint8Array.from(
-            atob(req.body.clientDataJSON), c => c.charCodeAt(0));
-    const c = JSON.parse(new TextDecoder().decode(
-        clientDataJSONArray
-        ));
-
-    const credential = await getCredential(webSafeBase64(req.body.credentialID));
-
-    const response = {
-        challengeID: req.body.challengeID,
-        clientData: c,
-        challenge: challenge,
-        credential: credential
-    };
-
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: response
-    };
+        const challenge = await getChallenge(req.body.challengeID);
+    
+        const clientDataJSONArray = 
+            Uint8Array.from(
+                atob(req.body.clientDataJSON), c => c.charCodeAt(0));
+        const c = JSON.parse(new TextDecoder().decode(
+            clientDataJSONArray
+            ));
+    
+        const credential = await getCredential(webSafeBase64(req.body.credentialID));
+    
+        const response = {
+            challengeID: req.body.challengeID,
+            clientData: c,
+            challenge: challenge,
+            credential: credential
+        };
+    
+        context.res = {
+            // status: 200, /* Defaults to 200 */
+            body: response
+        };
+    } catch (err) {
+        context.res = {
+            status: 500,
+            body: '' + err
+        };
+    }
 }
