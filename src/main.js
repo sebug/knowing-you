@@ -105,6 +105,7 @@ async function login() {
   try {
     const assertion = await navigator.credentials.get(options);
     const objectToSend = {
+      credentialID: assertion.id,
       challengeID: challenge.id,
       clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON)))
     };
