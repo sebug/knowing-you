@@ -60,6 +60,10 @@ async function register() {
     console.log(registerObj);
 }
 
+async function login() {
+  console.log('Starting login');
+}
+
 
 async function getMessage() {
     const genericMessageResponse = await fetch('/api/GenericMessageTrigger');
@@ -79,4 +83,12 @@ if (registerForm) {
         register();
         ev.preventDefault();
     });
+}
+
+const loginForm = document.querySelector('#login');
+if (loginForm) {
+  loginForm.addEventListener('submit', (ev) => {
+    login();
+    ev.preventDefault();
+  });
 }
