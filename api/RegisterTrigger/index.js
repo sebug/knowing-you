@@ -246,7 +246,7 @@ module.exports = async function (context, req) {
             crv: publicKeyInfo.crv,
             x: publicKeyInfo.x,
             y: publicKeyInfo.y,
-            signCount: signCount,
+            signCount: counter,
             transports: req.body.transports.join(','),
             backupEligible: beBit,
             backupState: bsBit
