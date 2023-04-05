@@ -6,7 +6,7 @@ async function register() {
         return;
     }
 
-    const usernameEl = document.querySelector('#username');
+    const usernameEl = document.querySelector('#username-field');
     const displayNameEl = document.querySelector('#displayname');
 
     const userName = usernameEl.value;
