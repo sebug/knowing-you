@@ -145,6 +145,11 @@ module.exports = async function (context, req) {
             return;
         }
 
+        const ecsig =
+        Uint8Array.from(
+            atob(actualSignatureBase64), c => c.charCodeAt(0)
+        );
+
         const authData =
             Uint8Array.from(
                 atob(authenticatorDataBase64), c => c.charCodeAt(0));
@@ -207,6 +212,10 @@ module.exports = async function (context, req) {
         const ecpub = '04' + pubk;
 
         const pkec = ec.keyFromPublic(ecpub, 'hex');
+
+        const hashOfConcatenation = crypto.createHash('sha256').update(concatenation).digest();
+
+        const signatureVerificationResult = ec.verify(hashOfConcatenation, ecsig, pkec);
     
         const response = {
             challengeID: req.body.challengeID,
@@ -219,7 +228,8 @@ module.exports = async function (context, req) {
             flags: flags,
             concatenation: concatenation,
             publicKeyInfo: publicKeyInfo,
-            ecpub: ecpub
+            ecpub: ecpub,
+            signatureVerificationResult: signatureVerificationResult
         };
     
         context.res = {
