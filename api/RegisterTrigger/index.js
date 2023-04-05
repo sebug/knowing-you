@@ -171,7 +171,7 @@ module.exports = async function (context, req) {
         if (!upBit) {
             context.res = {
                 status: 400,
-                body: 'User not present'qf
+                body: 'User not present'
             };
             return;
         }
