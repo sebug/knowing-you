@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const cbor = require('cbor');
 const { TableServiceClient, AzureNamedKeyCredential, TableClient } = require("@azure/data-tables");
+const EC = require('elliptic').ec;
 
 async function getTableClient(context, tableName) {
     const account = process.env.TABLES_STORAGE_ACCOUNT_NAME;
@@ -197,6 +198,15 @@ module.exports = async function (context, req) {
             y: Uint8Array.from(
                 atob(credential.y), c => c.charCodeAt(0))
         };
+
+        const ec = new EC('p256');
+
+        const pubk = Buffer.from(publicKeyInfo.x).toString('hex') +
+        Buffer.from(publicKeyInfo.y).toString('hex');
+
+        const ecpub = '04' + pubk;
+
+        const pkec = ec.keyFromPublic(ecpub, 'hex');
     
         const response = {
             challengeID: req.body.challengeID,
@@ -208,7 +218,8 @@ module.exports = async function (context, req) {
             authenticatorDataLength: authData.length,
             flags: flags,
             concatenation: concatenation,
-            publicKeyInfo: publicKeyInfo
+            publicKeyInfo: publicKeyInfo,
+            ecpub: ecpub
         };
     
         context.res = {

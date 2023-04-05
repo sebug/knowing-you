@@ -9,6 +9,7 @@
   "dependencies": {
     "@azure/data-tables": "^13.2.1",
     "cbor": "^8.1.0",
+    "elliptic": "^6.5.4",
     "uuid": "^9.0.0"
   }
 }
