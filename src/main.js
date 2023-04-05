@@ -107,7 +107,8 @@ async function login() {
     const objectToSend = {
       credentialID: assertion.id,
       challengeID: challenge.id,
-      clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON)))
+      clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON))),
+      signature: btoa(String.fromCharCode(...new Uint8Array(assertion.response.signature)))
     };
     const response = await fetch('/api/LoginTrigger', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(objectToSend)});
     const responseJson = await response.json();

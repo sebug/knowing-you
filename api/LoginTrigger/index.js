@@ -48,6 +48,17 @@ async function getCredential(context, rowKey) {
     }
 }
 
+async function deleteChallenge(context, rowKey) {
+    try {
+        const tableClient = await getTableClient(context, 'challenges');
+
+        await tableClient.deleteEntity('Prod', rowKey);
+    } catch (err) {
+        context.log(err);
+        throw err;
+    }
+}
+
 function webSafeBase64(s) {
     return s && s.replace(/=/g, '')
     .replace(/\//g, '_')
@@ -66,14 +77,60 @@ module.exports = async function (context, req) {
         const c = JSON.parse(new TextDecoder().decode(
             clientDataJSONArray
             ));
+
+        if (c.type !== 'webauthn.get') {
+            context.res = {
+                status: 400,
+                body: 'client data type is not correct'
+            };
+            return;
+        }
+
+        if (!challenge) {
+            context.res = {
+              status: 404,
+              body: 'Challenge not found'  
+            };
+            return;
+        }
+
+        if (webSafeBase64(challenge.randomBytes) !== webSafeBase64(c.challenge)) {
+            context.res = {
+                status: 400,
+                body: 'Invalid challenge value - expected ' + webSafeBase64(challenge) + ' and got ' +
+                webSafeBase64(c.challenge)
+            };
+            return;
+        }
     
         const credential = await getCredential(context, webSafeBase64(req.body.credentialID));
+
+        if (!credential) {
+            context.res = {
+                status: 404,
+                body: 'Credential not found'
+            };
+            return;
+        }
+
+        await deleteChallenge(context, req.body.challengeID);
+
+        const signatureBase64 = req.body.signature;
+
+        if (!signatureBase64) {
+            context.res = {
+                status: 400,
+                body: 'Signature not sent'
+            };
+            return;
+        }
     
         const response = {
             challengeID: req.body.challengeID,
             clientData: c,
             challenge: challenge,
-            credential: credential
+            credential: credential,
+            signature: signatureBase64
         };
     
         context.res = {
