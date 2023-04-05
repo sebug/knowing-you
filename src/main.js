@@ -75,7 +75,7 @@ async function login() {
     return;
   }
   console.log('Starting login');
-  const challenge = window.loginChallenge;
+  let challenge = window.loginChallenge;
   if (!challenge) {
     challenge = getChallenge();
   } else {
@@ -84,12 +84,44 @@ async function login() {
       window.loginChallenge = challenge;
     });
   }
+
+  const usernameEl = document.querySelector('#username-field');
+  const displayNameEl = document.querySelector('#displayname');
+
+  const userName = usernameEl.value;
+  const displayName = displayNameEl.value;
+
   const options = {
     publicKey: {
+      // Relying Party (a.k.a. - Service):
+      rp: {
+        name: "delightful-meadow-0e5ed2b03.2.azurestaticapps.net"
+      },
+
+      user: {
+        id: new Uint8Array(16),
+        name: userName,
+        displayName: displayName,
+      },
+  
+      pubKeyCredParams: [
+        {
+          type: "public-key",
+          alg: -7,
+        },
+      ],
+  
+      attestation: "direct",
+  
+      timeout: 60000,
+  
       challenge: challenge.buffer
     },
     mediation: 'conditional'
   };
+
+  
+
   try {
     const assertion = await navigator.credentials.get(options);
     console.log(assertion);
