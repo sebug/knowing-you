@@ -58,7 +58,7 @@ module.exports = async function (context, req) {
     try {
         context.log('Login trigger function processed a request.');
 
-        const challenge = await getChallenge(req.body.challengeID);
+        const challenge = await getChallenge(context, req.body.challengeID);
     
         const clientDataJSONArray = 
             Uint8Array.from(
@@ -67,7 +67,7 @@ module.exports = async function (context, req) {
             clientDataJSONArray
             ));
     
-        const credential = await getCredential(webSafeBase64(req.body.credentialID));
+        const credential = await getCredential(context, webSafeBase64(req.body.credentialID));
     
         const response = {
             challengeID: req.body.challengeID,
