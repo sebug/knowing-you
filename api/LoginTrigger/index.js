@@ -162,6 +162,28 @@ module.exports = async function (context, req) {
         }
 
         const flags = authData[32];
+
+        // 14 check that the UP bit is present - least significant bit
+        const upBit = Boolean(flags & (1 << 0));
+        if (!upBit) {
+            context.res = {
+                status: 400,
+                body: 'User not present'
+            };
+            return;
+        }
+
+        // 15 ensure user verification bit is present
+        const uvBit = Boolean(flags & (1 << 2));
+        if (!uvBit) {
+            context.res = {
+                status: 400,
+                body: 'User verification not present'
+            };
+            return;
+        }
+
+        const hash = crypto.createHash('sha256').update(clientDataJSONArray).digest();
     
         const response = {
             challengeID: req.body.challengeID,
@@ -171,7 +193,8 @@ module.exports = async function (context, req) {
             signature: actualSignatureBase64,
             auhenticatorData: authenticatorDataBase64,
             authenticatorDataLength: authData.length,
-            flags: flags
+            flags: flags,
+            hash: hash
         };
     
         context.res = {
