@@ -92,32 +92,12 @@ async function login() {
   const displayName = displayNameEl.value;
 
   const options = {
-    publicKey: {
-      // Relying Party (a.k.a. - Service):
-      rp: {
-        name: "delightful-meadow-0e5ed2b03.2.azurestaticapps.net"
-      },
-
-      user: {
-        id: new Uint8Array(16),
-        name: userName,
-        displayName: displayName,
-      },
-  
-      pubKeyCredParams: [
-        {
-          type: "public-key",
-          alg: -7,
-        },
-      ],
-  
-      attestation: "direct",
-  
+    publicKey: {  
       timeout: 60000,
   
-      challenge: challenge.buffer
-    },
-    mediation: 'conditional'
+      challenge: challenge.buffer,
+      userVerification: 'preferred'
+    }
   };
 
   
