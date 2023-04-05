@@ -48,6 +48,24 @@ async function deleteChallenge(context, rowKey) {
     }
 }
 
+async function insertCredential(context, credential) {
+    try {
+        const tableClient = await getTableClient(context, 'credentials');
+
+        await tableClient.createEntity(credential);
+        return credential;
+    } catch (err) {
+        context.log(err);
+        throw err;
+    }
+}
+
+function webSafeBase64(s) {
+    return s && s.replace(/=/g, '')
+    .replace(/\//g, '_')
+    .replace(/\+/g, '-');
+}
+
 module.exports = async function (context, req) {
     try {
         context.log('JavaScript HTTP trigger function processed a request.');
@@ -88,14 +106,11 @@ module.exports = async function (context, req) {
         }
 
         // 8. require that the challenge matches
-        if (challenge.randomBytes.replace(/=/g, '')
-        .replace(/\//g, '_')
-        .replace(/\+/g, '-')
-        !== c.challenge) {
+        if (webSafeBase64(challenge.randomBytes) !== webSafeBase64(c.challenge)) {
             context.res = {
                 status: 400,
-                body: 'Invalid challenge value - expected ' + challenge.randomBytes.replace(/=/g, '') + ' and got ' +
-                c.challenge
+                body: 'Invalid challenge value - expected ' + webSafeBase64(challenge) + ' and got ' +
+                webSafeBase64(c.challenge)
             };
             return;
         }
@@ -223,25 +238,22 @@ module.exports = async function (context, req) {
         
 
         // No extensions were specified, we don't have to check on anything here
-
+        const credential = {
+            partitionKey: 'Prod',
+            rowKey: webSafeBase64(credentialID),
+            // Public key parameters
+            kty: publicKeyInfo.kty,
+            crv: publicKeyInfo.crv,
+            x: publicKeyInfo.x,
+            y: publicKeyInfo.y,
+            signCount: signCount,
+            transports: req.body.transports.join(','),
+            backupEligible: beBit,
+            backupState: bsBit
+        };
 
     
-        const response = {
-            challenge: challenge,
-            clientData: c,
-            attestationObject: attestationObject,
-            hash: hash,
-            flags: flags,
-            aaguid: aaguid,
-            l: l,
-            credentialID: credentialID,
-            keyData: keyData,
-            userName: req.body.userName,
-            displayName: req.body.displayName,
-            counter: counter,
-            publicKeyInfo: publicKeyInfo,
-            transports: req.body.transports
-        };
+        const response = await insertCredential(context, credential); // will fail if already exists, which is what we want anyway
     
         context.res = {
             // status: 200, /* Defaults to 200 */
