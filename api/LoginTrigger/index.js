@@ -86,6 +86,15 @@ module.exports = async function (context, req) {
             return;
         }
 
+        // check that the origin matches
+        if (c.origin.toLowerCase() !== process.env.ALLOWED_ORIGIN) {
+            context.res = {
+                status: 400,
+                body: 'Invalid origin'
+            };
+            return;
+        }
+
         if (!challenge) {
             context.res = {
               status: 404,
@@ -115,9 +124,9 @@ module.exports = async function (context, req) {
 
         await deleteChallenge(context, req.body.challengeID);
 
-        const signatureBase64 = req.body.signature;
+        const actualSignatureBase64 = req.body.signature;
 
-        if (!signatureBase64) {
+        if (!actualSignatureBase64) {
             context.res = {
                 status: 400,
                 body: 'Signature not sent'
@@ -130,7 +139,7 @@ module.exports = async function (context, req) {
             clientData: c,
             challenge: challenge,
             credential: credential,
-            signature: signatureBase64
+            signature: actualSignatureBase64
         };
     
         context.res = {
