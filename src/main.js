@@ -113,26 +113,15 @@ async function login() {
     };
     const response = await fetch('/api/LoginTrigger', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(objectToSend)});
     const responseJson = await response.json();
-    console.log(responseJson);
-    console.log(assertion);
-    window.assertion = assertion;
+
+    const messagePlaceholder = document.querySelector('#message-placeholder');
+    if (messagePlaceholder) {
+        messagePlaceholder.innerHTML = 'Hello ' + responseJson.displayName;
+    }
   } catch (e) {
     console.error(e);
   }
 }
-
-
-async function getMessage() {
-    const genericMessageResponse = await fetch('/api/GenericMessageTrigger');
-    const genericContent = await genericMessageResponse.text();
-
-    const messagePlaceholder = document.querySelector('#message-placeholder');
-    if (messagePlaceholder) {
-        messagePlaceholder.innerHTML = genericContent;
-    }
-}
-
-getMessage();
 
 const registerForm = document.querySelector('#register');
 if (registerForm) {
