@@ -215,6 +215,8 @@ module.exports = async function (context, req) {
 
         const hashOfConcatenation = crypto.createHash('sha256').update(concatenation).digest();
 
+        hashOfConcatenation[3] = 42; // explicitly breaking it
+
         const signatureVerificationResult = ec.verify(hashOfConcatenation, ecsig, pkec);
     
         const response = {
