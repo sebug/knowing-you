@@ -128,6 +128,14 @@ module.exports = async function (context, req) {
 
         const authenticatorDataBase64 = req.body.authenticatorData;
 
+        if (!authenticatorDataBase64) {
+            context.res = {
+                status: 400,
+                body: 'Authenticator data not sent'
+            };
+            return;
+        }
+
         if (!actualSignatureBase64) {
             context.res = {
                 status: 400,
@@ -135,6 +143,10 @@ module.exports = async function (context, req) {
             };
             return;
         }
+
+        const authenticatorDataBytes =
+            Uint8Array.from(
+                atob(authenticatorDataBase64), c => c.charCodeAt(0));
     
         const response = {
             challengeID: req.body.challengeID,
@@ -142,7 +154,8 @@ module.exports = async function (context, req) {
             challenge: challenge,
             credential: credential,
             signature: actualSignatureBase64,
-            auhenticatorData: authenticatorDataBase64
+            auhenticatorData: authenticatorDataBase64,
+            authenticatorDataLength: authenticatorDataBytes.length
         };
     
         context.res = {
