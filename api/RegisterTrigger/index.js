@@ -249,7 +249,9 @@ module.exports = async function (context, req) {
             signCount: counter,
             transports: req.body.transports.join(','),
             backupEligible: beBit,
-            backupState: bsBit
+            backupState: bsBit,
+            userName: req.body.userName,
+            displayName: req.body.displayName
         };
 
     

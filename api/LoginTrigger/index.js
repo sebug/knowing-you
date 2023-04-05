@@ -226,18 +226,8 @@ module.exports = async function (context, req) {
         }
     
         const response = {
-            challengeID: req.body.challengeID,
-            clientData: c,
-            challenge: challenge,
-            credential: credential,
-            signature: actualSignatureBase64,
-            auhenticatorData: authenticatorDataBase64,
-            authenticatorDataLength: authData.length,
-            flags: flags,
-            concatenation: concatenation,
-            publicKeyInfo: publicKeyInfo,
-            ecpub: ecpub,
-            signatureVerificationResult: signatureVerificationResult
+            userName: credential.userName,
+            displayName: credential.displayName
         };
     
         context.res = {
