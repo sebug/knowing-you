@@ -21,7 +21,7 @@ async function register() {
         publicKey: {
           // Relying Party (a.k.a. - Service):
           rp: {
-            name: "sebugch",
+            name: "delightful-meadow-0e5ed2b03.2.azurestaticapps.net"
           },
 
           user: {
