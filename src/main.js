@@ -104,6 +104,13 @@ async function login() {
 
   try {
     const assertion = await navigator.credentials.get(options);
+    const objectToSend = {
+      challengeID: challenge.id,
+      clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(assertion.response.clientDataJSON)))
+    };
+    const response = await fetch('/api/LoginTrigger', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(objectToSend)});
+    const responseJson = await response.json();
+    console.log(responseJson);
     console.log(assertion);
     window.assertion = assertion;
   } catch (e) {
