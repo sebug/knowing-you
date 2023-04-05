@@ -144,9 +144,24 @@ module.exports = async function (context, req) {
             return;
         }
 
-        const authenticatorDataBytes =
+        const authData =
             Uint8Array.from(
                 atob(authenticatorDataBase64), c => c.charCodeAt(0));
+
+        const expectedRpIdHash = crypto.createHash('sha256').update(process.env.RP_ID, 'utf8').digest();
+
+        const actualRpIdHash = authData.slice(0, 32);
+
+        // 13 - compare RP ID hash
+        if (expectedRpIdHash.compare(actualRpIdHash) !== 0) {
+            context.res = {
+                status: 400,
+                body: 'Invalid RP ID'
+            };
+            return;
+        }
+
+        const flags = authData[32];
     
         const response = {
             challengeID: req.body.challengeID,
@@ -155,7 +170,8 @@ module.exports = async function (context, req) {
             credential: credential,
             signature: actualSignatureBase64,
             auhenticatorData: authenticatorDataBase64,
-            authenticatorDataLength: authenticatorDataBytes.length
+            authenticatorDataLength: authData.length,
+            flags: flags
         };
     
         context.res = {
